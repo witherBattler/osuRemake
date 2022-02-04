@@ -2,19 +2,31 @@
 var music
 var snare
 var font1;
+var allerFont
 
 //Variables
-var musicPlaying = false;
+var pointerCursor = false;
+var stage = "loading"
 var updateFrames = 0;
 var score = 0;
+var animationValues = {
+    assetsLoadedCount: 0,
+    assetsToLoadCount: 4,
+}
 function setup() {
     createCanvas(window.innerWidth, window.innerHeight)
     music = loadSound("music/music1.mp3", function() {
-        music.play()
-        musicPlaying = true;
+        animationValues.assetsLoadedCount++;
     })
-    snare = loadSound("music/snare.mp3")
-    font1 = loadFont("fonts/BADABB__.TTF")
+    snare = loadSound("music/snare.mp3", function() {
+        animationValues.assetsLoadedCount++;
+    })
+    font1 = loadFont("fonts/BADABB__.TTF", function() {
+        animationValues.assetsLoadedCount++;
+    })
+    allerFont = loadFont("fonts/Aller.ttf", function() {
+        animationValues.assetsLoadedCount++;
+    })
     frameRate(60)
 }
 var effects = [{}]
@@ -267,20 +279,73 @@ var bubbles = [
 
 
 function draw() {
-    background("#FFBC09")
-    textSize(40)
-    noStroke()
-    fill("black")
-    text(updateFrames, 300, 50);
-    noStroke();
-    if(musicPlaying) {
-        updateFrames++;
-        drawBubbles()
-        drawEffects()
+    switch(stage) {
+        case "game":
+            background("#33186b")
+            textSize(40)
+            noStroke()
+            fill("black")
+            text(score, 300, 50);
+            noStroke();
+            updateFrames++;
+            drawBubbles()
+            drawEffects()
+            break;
+        case "loading":
+            background("grey");
+            rectMode(CORNER);
+            stroke("black")
+            strokeWeight(5);
+            fill("white")
+            rect(window.innerWidth / 4, window.innerHeight / 2 - 20, window.innerWidth / 2, 40)
+            fill("black")
+            rect(window.innerWidth / 4, window.innerHeight / 2 - 20, window.innerWidth / 2 * animationValues.assetsLoadedCount / animationValues.assetsToLoadCount, 40)
+            noStroke();
+            textFont("Arial")
+            textAlign(CENTER, CENTER)
+            textSize(30)
+            fill("black")
+            text("Loading game assets...", window.innerWidth / 2, window.innerHeight / 2 - 60)
+            text("(" + Math.round(animationValues.assetsLoadedCount / animationValues.assetsToLoadCount * 100) + "%)", window.innerWidth / 2, window.innerHeight / 2 + 60)
+            if(animationValues.assetsLoadedCount == animationValues.assetsToLoadCount) {
+                stage = "menu";
+            }
+            break;
+        case "menu":
+            background("#33186b")
+            noStroke();
+            fill("#ff66aa")
+            textAlign(CENTER, CENTER)
+            textFont(allerFont)
+            textSize(60)
+            text("osu!", window.innerWidth / 2, 60)
+            fill("#1780e3")
+            textSize(35)
+            text("NO ANIME", window.innerWidth / 2, 110)
+            var playButtonHovered = false;
+            mouseIsOverButton(window.innerWidth / 2, window.innerHeight / 2, window.innerWidth / 3, 50, function() {
+                if(mouseIsPressed){
+                    stage = "game"
+                    score = 0;
+                    music.play()
+                }
+                playButtonHovered = true;
+            })
+            if(!playButtonHovered) {
+                noFill();
+            } else {
+                fill("#402180")
+            }
+            stroke("#ff66aa")
+            strokeWeight(5)
+            rectMode(CENTER)
+            rect(window.innerWidth / 2, window.innerHeight / 2, window.innerWidth / 3, 50, 15, 15 ,15 ,15)
+            noStroke();
+            fill("#ff66aa")
+            text("Play", window.innerWidth / 2, window.innerHeight / 2 - 7)
+            break;
     }
-    if(keyIsDown(32)) {
-        throw new Error("Here")
-    }
+    updateCursor()
 }
 
 
@@ -298,7 +363,7 @@ function drawBubbles() {
                 textAlign(RIGHT)
                 bubbles[i].clicked = true;
                 snare.play()
-                score += 500;
+                score += 1000;
             }
         }
     }
@@ -318,19 +383,43 @@ function drawEffects() {
     }
 }
 
-function manageMusic1() {
-    updateFrames++;
-}
-
-const mapCreating = true;
-var bubblesCreator = [
-    
-]
-
-function keyPressed() {
-    if(keyCode == 65) {
-        bubblesCreator.push({x: 0, y: 0, frames: updateFrames, clicked: false})
-    } else if(keyCode == 83) {
-        console.log(JSON.stringify(bubblesCreator))
+function mouseIsOverButton(x, y, width, height, funcToExecute) {
+    var left = x - width / 2
+    var right = x + width / 2
+    var top = y - height / 2
+    var bottom = y + height / 2
+    console.log(left)
+    console.log(right)
+    console.log(top)
+    console.log(bottom)
+    if(mouseX > left && mouseX < right && mouseY > top && mouseY < bottom) {
+        funcToExecute()
+        pointerCursor = true;
     }
 }
+
+function updateCursor() {
+    if(pointerCursor) {
+        cursor("pointer")
+        pointerCursor = false;
+    } else {
+        cursor("default")
+    }
+}
+
+function mousePressed() {
+    score -= 500
+}
+
+//const mapCreating = true;
+//var bubblesCreator = [
+//    
+//]
+//
+//function keyPressed() {
+//    if(keyCode == 65) {
+//        bubblesCreator.push({x: 0, y: 0, frames: updateFrames, clicked: false})
+//    } else if(keyCode == 83) {
+//        console.log(JSON.stringify(bubblesCreator))
+//    }
+//}
