@@ -288,7 +288,8 @@ function draw() {
             textSize(40)
             noStroke()
             fill("black")
-            text(score, 300, 50);
+            textAlign(LEFT, TOP)
+            text(score, 10, 5);
             noStroke();
             updateFrames++;
             var textEffect = getEffectById("songname1")
@@ -368,14 +369,14 @@ function drawBubbles() {
     for(var i = 0; i != bubbles.length; i++) {
         if(!bubbles[i].clicked){
             if(bubbles[i].frames >= updateFrames && bubbles[i].frames - 60 <= updateFrames) {
-                stroke("blue")
+                var percentage = Math.round(Math.abs(bubbles[i].frames - updateFrames) * 1.66666666666666666)
+                stroke("rgb(0, 0, " + (255 - Math.round(percentage * 2.55)) + ")")
                 strokeWeight(5)
                 noFill()
                 circle(bubbles[i].x * window.innerWidth, bubbles[i].y * window.innerHeight, 100)
                 circle(bubbles[i].x * window.innerWidth, bubbles[i].y * window.innerHeight, 100 + Math.abs(bubbles[i].frames - updateFrames) * 2)
             }
             if(mouseIsPressed && bubbles[i].frames > updateFrames && bubbles[i].frames - 20 < updateFrames && dist(bubbles[i].x * window.innerWidth, bubbles[i].y * window.innerHeight, mouseX, mouseY) < 60) {
-                textAlign(RIGHT)
                 bubbles[i].clicked = true;
                 snare.play()
                 score += 1000;
@@ -403,10 +404,6 @@ function mouseIsOverButton(x, y, width, height, funcToExecute) {
     var right = x + width / 2
     var top = y - height / 2
     var bottom = y + height / 2
-    console.log(left)
-    console.log(right)
-    console.log(top)
-    console.log(bottom)
     if(mouseX > left && mouseX < right && mouseY > top && mouseY < bottom) {
         funcToExecute()
         pointerCursor = true;
@@ -424,6 +421,7 @@ function updateCursor() {
 
 function mousePressed() {
     score -= 500
+    score = Math.max(score, 0)
 }
 
 function getEffectById(id) {
