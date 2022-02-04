@@ -5,6 +5,8 @@ var font1;
 var allerFont
 
 //Variables
+let level;
+let amp;
 var pointerCursor = false;
 var stage = "loading"
 var updateFrames = 0;
@@ -27,6 +29,7 @@ function setup() {
     allerFont = loadFont("fonts/Aller.ttf", function() {
         animationValues.assetsLoadedCount++;
     })
+    amp = new p5.Amplitude()
     frameRate(60)
 }
 var effects = [{}]
@@ -281,15 +284,27 @@ var bubbles = [
 function draw() {
     switch(stage) {
         case "game":
-            background("#33186b")
+            background("rgb(51, 24, 107)")
             textSize(40)
             noStroke()
             fill("black")
             text(score, 300, 50);
             noStroke();
             updateFrames++;
-            drawBubbles()
+            var textEffect = getEffectById("songname1")
+            if(textEffect == null){
+                effects.push({type: "text", id: "songname1", font: allerFont, size: 80, strokeWeight: 0, stroke: "#000000", color: "#ff66aa", x: window.innerWidth / 2, y: window.innerHeight / 2, text: "Poylow - Got Me"})
+            }
+            //Visualize audio:
+            if(level != undefined) {
+                level = (level + level + level + level + amp.getLevel()) / 5
+            } else {
+                level = amp.getLevel()
+            }
+            ellipse(window.innerWidth / 2, window.innerHeight / 2, level * (window.innerWidth / 2))
+            //Visualize others
             drawEffects()
+            drawBubbles()
             break;
         case "loading":
             background("grey");
@@ -409,6 +424,15 @@ function updateCursor() {
 
 function mousePressed() {
     score -= 500
+}
+
+function getEffectById(id) {
+    for(var i = 0; i != effects.length; i++) {
+        if(effects[i].id == id) {
+            return effects[i]
+        }
+    }
+    return null;
 }
 
 //const mapCreating = true;
