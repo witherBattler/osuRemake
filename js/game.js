@@ -1,10 +1,10 @@
 //Assets
 var musics = []
 var snare
-var font1;
 var allerFont
 
 //Variables
+let paused = false;
 let level;
 let amp;
 var pointerCursor = false;
@@ -13,7 +13,7 @@ var updateFrames = 0;
 var score = 0;
 var animationValues = {
     assetsLoadedCount: 0,
-    assetsToLoadCount: 7,
+    assetsToLoadCount: 6,
 }
 var bubbles = [];
 function setup() {
@@ -25,15 +25,12 @@ function setup() {
     }
     for(var i = 0; i != musics.length; i++) {
         musics[i].onended(function() {
-            if(stage == "game" && updateFrames > 60){
+            if(stage == "game" && updateFrames > 60 && !paused){
                 stage = "menu";
             }
         })
     }
     snare = loadSound("music/snare.mp3", function() {
-        animationValues.assetsLoadedCount++;
-    })
-    font1 = loadFont("fonts/BADABB__.TTF", function() {
         animationValues.assetsLoadedCount++;
     })
     allerFont = loadFont("fonts/Aller.ttf", function() {
@@ -55,12 +52,20 @@ function draw() {
             textAlign(LEFT, TOP)
             text(score, 10, 5);
             noStroke();
-            updateFrames++;
-            //Visualize audio:
-            if(level != undefined) {
-                level = (level + level + level + level + amp.getLevel()) / 5
-            } else {
-                level = amp.getLevel()
+            if(!paused) {
+                updateFrames++;
+                //Visualize audio:
+                if(level != undefined) {
+                    level = (level + level + level + level + amp.getLevel()) / 5
+                } else {
+                    level = amp.getLevel()
+                }
+                fill("white")
+                textAlign(CENTER, CENTER)
+                textFont(allerFont)
+                textSize(30)
+                noStroke()
+                text("Click anywhere to pause", window.innerWidth / 2, window.innerHeight - 100)
             }
             fill("black")
             ellipse(window.innerWidth / 2, window.innerHeight / 2, level * (window.innerWidth / 2))
@@ -71,6 +76,17 @@ function draw() {
             textAlign(CENTER, CENTER);
             text(soundtracks[soundtrackIndex].name, window.innerWidth / 2, window.innerHeight / 2 - 5)
             drawBubbles()
+            if(paused) {
+                background("rgba(0, 0, 0, 0.5)")
+                fill("white")
+                textAlign(CENTER, CENTER)
+                textFont(allerFont)
+                textSize(30)
+                noStroke()
+                text("Click anywhere to continue", window.innerWidth / 2, window.innerHeight - 100)
+                textSize(100)
+                text("PAUSED!", window.innerWidth / 2, window.innerHeight / 3)
+            }
             break;
         case "loading":
             background("grey");
@@ -202,63 +218,79 @@ function getEffectById(id) {
 function mousePressed() {
     switch(stage) {
         case "menu":
-            mouseIsOverButton(window.innerWidth / 2, window.innerHeight / 2, window.innerWidth / 3, 50, function() {
-                updateFrames = 0;
-                musics[soundtrackIndex].stop()
-                musics[soundtrackIndex].play()
-                stage = "game"
-                score = 0;
-                bubbles = JSON.parse(JSON.stringify(soundtracks[soundtrackIndex].bubbles))
-            })
-            var triangleBaseLeft = {x: window.innerWidth / 3 + 30, y: window.innerHeight / 2 - 60}
-            var triangleBaseRight = {x: (window.innerWidth / 3) * 2 - 30, y: window.innerHeight / 2 - 60}
-            if(mouseY > triangleBaseLeft.y - 20 && mouseY < triangleBaseLeft.y + 20){
-                if(mouseX > triangleBaseLeft.x - 20 && mouseX < triangleBaseLeft.x + 10) {
+            if(mouseButton == LEFT){
+                mouseIsOverButton(window.innerWidth / 2, window.innerHeight / 2, window.innerWidth / 3, 50, function() {
+                    updateFrames = 0;
                     musics[soundtrackIndex].stop()
-                    if(soundtrackIndex != 0) {
-                        soundtrackIndex--;
-                    } else {
-                        soundtrackIndex = soundtracks.length - 1;
-                    }
                     musics[soundtrackIndex].play()
-                } else if(mouseX > triangleBaseRight.x - 10 && mouseX < triangleBaseRight.x + 20) {
-                    musics[soundtrackIndex].stop()
-                    if(soundtrackIndex != soundtracks.length - 1) {
-                        soundtrackIndex++;
-                    } else {
-                        soundtrackIndex = 0;
+                    stage = "game"
+                    score = 0;
+                    bubbles = JSON.parse(JSON.stringify(soundtracks[soundtrackIndex].bubbles))
+                })
+                var triangleBaseLeft = {x: window.innerWidth / 3 + 30, y: window.innerHeight / 2 - 60}
+                var triangleBaseRight = {x: (window.innerWidth / 3) * 2 - 30, y: window.innerHeight / 2 - 60}
+                if(mouseY > triangleBaseLeft.y - 20 && mouseY < triangleBaseLeft.y + 20){
+                    if(mouseX > triangleBaseLeft.x - 20 && mouseX < triangleBaseLeft.x + 10) {
+                        musics[soundtrackIndex].stop()
+                        if(soundtrackIndex != 0) {
+                            soundtrackIndex--;
+                        } else {
+                            soundtrackIndex = soundtracks.length - 1;
+                        }
+                        musics[soundtrackIndex].play()
+                    } else if(mouseX > triangleBaseRight.x - 10 && mouseX < triangleBaseRight.x + 20) {
+                        musics[soundtrackIndex].stop()
+                        if(soundtrackIndex != soundtracks.length - 1) {
+                            soundtrackIndex++;
+                        } else {
+                            soundtrackIndex = 0;
+                        }
+                        musics[soundtrackIndex].play()
                     }
-                    musics[soundtrackIndex].play()
                 }
             }
             break;
         case "game":
-            var bubbleClicked = false;
-            for(var i = 0; i != bubbles.length; i++) {
-                if(!bubbles[i].clicked){
-                    if(bubbles[i].frames > updateFrames && bubbles[i].frames - 20 < updateFrames && dist(bubbles[i].x * window.innerWidth, bubbles[i].y * window.innerHeight, mouseX, mouseY) < 60) {
-                        bubbleClicked = true;
-                        bubbles[i].clicked = true;
+            if(mouseButton == LEFT){
+                var bubbleClicked = false;
+                for(var i = 0; i != bubbles.length; i++) {
+                    if(!bubbles[i].clicked){
+                        if(bubbles[i].frames > updateFrames && bubbles[i].frames - 20 < updateFrames && dist(bubbles[i].x * window.innerWidth, bubbles[i].y * window.innerHeight, mouseX, mouseY) < 60) {
+                            bubbleClicked = true;
+                            bubbles[i].clicked = true;
+                        }
                     }
                 }
-            }
-            if(bubbleClicked == true) {
-                snare.play()
-                score += 500
-            } else {
-                score -= 500
-                score = Math.max(score, 0)
+                if(bubbleClicked == true) {
+                    snare.play()
+                    score += 500
+                } else {
+                    score -= 500
+                    score = Math.max(score, 0)
+                }
+                if(paused) {
+                    paused = false;
+                    musics[soundtrackIndex].play()
+                }
+            } else if(mouseButton == RIGHT) {
+                if(!paused){
+                    paused = true;
+                    musics[soundtrackIndex].pause()
+                }
             }
             break;
         case "loading":
-            if(animationValues.assetsLoadedCount == animationValues.assetsToLoadCount) {
-                stage = "menu";
-                musics[soundtrackIndex].play()
+            if(mouseButton == LEFT){
+                if(animationValues.assetsLoadedCount == animationValues.assetsToLoadCount) {
+                    stage = "menu";
+                    musics[soundtrackIndex].play()
+                }
             }
             break;
     }
 
 }
+document.addEventListener('contextmenu', event => event.preventDefault());
 
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
