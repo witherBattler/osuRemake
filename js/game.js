@@ -13,7 +13,7 @@ var updateFrames = 0;
 var score = 0;
 var animationValues = {
     assetsLoadedCount: 0,
-    assetsToLoadCount: 6,
+    assetsToLoadCount: 7,
 }
 var bubbles = [];
 function setup() {
@@ -202,7 +202,6 @@ function getEffectById(id) {
 }
 
 function mousePressed() {
-    console.log("asdf")
     switch(stage) {
         case "menu":
             mouseIsOverButton(window.innerWidth / 2, window.innerHeight / 2, window.innerWidth / 3, 50, function() {
@@ -261,4 +260,8 @@ function mousePressed() {
             break;
     }
 
+}
+
+function windowResized() {
+    resizeCanvas(windowWidth, windowHeight);
 }
