@@ -102,9 +102,6 @@ function draw() {
             textFont(allerFont)
             textSize(60)
             text("osu!", window.innerWidth / 2, 60)
-            fill("#1780e3")
-            textSize(35)
-            text("NO ANIME", window.innerWidth / 2, 110)
             noFill()
             stroke(soundtracks[soundtrackIndex].secondColor)
             strokeWeight(5)
@@ -112,6 +109,7 @@ function draw() {
             rect(window.innerWidth / 2, window.innerHeight / 2, window.innerWidth / 3, 50, 15, 15 ,15 ,15)
             noStroke();
             fill(soundtracks[soundtrackIndex].secondColor)
+            textSize(35)
             text("Play", window.innerWidth / 2, window.innerHeight / 2 - 7)
             var triangleBaseLeft = {x: window.innerWidth / 3 + 30, y: window.innerHeight / 2 - 60}
             var triangleBaseRight = {x: (window.innerWidth / 3) * 2 - 30, y: window.innerHeight / 2 - 60}
