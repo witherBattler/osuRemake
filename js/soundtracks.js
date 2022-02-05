@@ -1,4 +1,4 @@
-let soundtrackIndex = 1
+let soundtrackIndex = 0
 
 let soundtracks = [
     {
