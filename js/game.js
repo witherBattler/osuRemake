@@ -25,7 +25,9 @@ function setup() {
     }
     for(var i = 0; i != musics.length; i++) {
         musics[i].onended(function() {
-            stage = "menu";
+            if(stage != "menu" && updateFrames > 1){
+                stage = "menu";
+            }
         })
     }
     snare = loadSound("music/snare.mp3", function() {
@@ -85,10 +87,16 @@ function draw() {
             textSize(30)
             fill("black")
             text("Loading game assets...", window.innerWidth / 2, window.innerHeight / 2 - 60)
-            text("(" + Math.round(animationValues.assetsLoadedCount / animationValues.assetsToLoadCount * 100) + "%)", window.innerWidth / 2, window.innerHeight / 2 + 60)
+            var additionalText = "";
             if(animationValues.assetsLoadedCount == animationValues.assetsToLoadCount) {
-                stage = "menu";
+                if(mouseIsPressed) {
+                    stage = "menu";
+                    musics[soundtrackIndex].play()
+                }
+                additionalText = ", click anywhere on the screen to begin."
             }
+            text("(" + Math.round(animationValues.assetsLoadedCount / animationValues.assetsToLoadCount * 100) + "%" + additionalText + ")", window.innerWidth / 2, window.innerHeight / 2 + 60)
+            
             break;
         case "menu":
             background(soundtracks[soundtrackIndex].backgroundColor)
@@ -101,14 +109,6 @@ function draw() {
             fill("#1780e3")
             textSize(35)
             text("NO ANIME", window.innerWidth / 2, 110)
-            mouseIsOverButton(window.innerWidth / 2, window.innerHeight / 2, window.innerWidth / 3, 50, function() {
-                if(mouseIsPressed){
-                    stage = "game"
-                    score = 0;
-                    bubbles = JSON.parse(JSON.stringify(soundtracks[soundtrackIndex].bubbles))
-                    musics[soundtrackIndex].play()
-                }
-            })
             noFill()
             stroke(soundtracks[soundtrackIndex].secondColor)
             strokeWeight(5)
@@ -129,6 +129,9 @@ function draw() {
                     pointerCursor = true
                 }
             }
+            mouseIsOverButton(window.innerWidth / 2, window.innerHeight / 2, window.innerWidth / 3, 50, function() {
+                pointerCursor = true;
+            })
             break;
     }
     updateCursor()
@@ -188,11 +191,6 @@ function updateCursor() {
     }
 }
 
-function mousePressed() {
-    score -= 500
-    score = Math.max(score, 0)
-}
-
 function getEffectById(id) {
     for(var i = 0; i != effects.length; i++) {
         if(effects[i].id == id) {
@@ -204,21 +202,32 @@ function getEffectById(id) {
 
 function mousePressed() {
     if(stage == "menu") {
+        mouseIsOverButton(window.innerWidth / 2, window.innerHeight / 2, window.innerWidth / 3, 50, function() {
+            musics[soundtrackIndex].stop()
+            musics[soundtrackIndex].play()
+            stage = "game"
+            score = 0;
+            bubbles = JSON.parse(JSON.stringify(soundtracks[soundtrackIndex].bubbles))
+        })
         var triangleBaseLeft = {x: window.innerWidth / 3 + 30, y: window.innerHeight / 2 - 60}
         var triangleBaseRight = {x: (window.innerWidth / 3) * 2 - 30, y: window.innerHeight / 2 - 60}
         if(mouseY > triangleBaseLeft.y - 20 && mouseY < triangleBaseLeft.y + 20){
             if(mouseX > triangleBaseLeft.x - 20 && mouseX < triangleBaseLeft.x + 10) {
+                musics[soundtrackIndex].stop()
                 if(soundtrackIndex != 0) {
                     soundtrackIndex--;
                 } else {
                     soundtrackIndex = soundtracks.length - 1;
                 }
+                musics[soundtrackIndex].play()
             } else if(mouseX > triangleBaseRight.x - 10 && mouseX < triangleBaseRight.x + 20) {
+                musics[soundtrackIndex].stop()
                 if(soundtrackIndex != soundtracks.length - 1) {
                     soundtrackIndex++;
                 } else {
                     soundtrackIndex = 0;
                 }
+                musics[soundtrackIndex].play()
             }
         }
     } else if(stage == "game") {
@@ -228,7 +237,6 @@ function mousePressed() {
                 if(bubbles[i].frames > updateFrames && bubbles[i].frames - 20 < updateFrames && dist(bubbles[i].x * window.innerWidth, bubbles[i].y * window.innerHeight, mouseX, mouseY) < 60) {
                     bubbleClicked = true;
                     bubbles[i].clicked = true;
-                    
                 }
             }
         }
@@ -237,6 +245,7 @@ function mousePressed() {
             score += 500
         } else {
             score -= 500
+            score = Math.max(score, 0)
         }
     }
 }
