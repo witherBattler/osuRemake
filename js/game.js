@@ -25,7 +25,7 @@ function setup() {
     }
     for(var i = 0; i != musics.length; i++) {
         musics[i].onended(function() {
-            if(stage != "menu" && updateFrames > 1){
+            if(stage == "game" && updateFrames > 60){
                 stage = "menu";
             }
         })
@@ -89,10 +89,6 @@ function draw() {
             text("Loading game assets...", window.innerWidth / 2, window.innerHeight / 2 - 60)
             var additionalText = "";
             if(animationValues.assetsLoadedCount == animationValues.assetsToLoadCount) {
-                if(mouseIsPressed) {
-                    stage = "menu";
-                    musics[soundtrackIndex].play()
-                }
                 additionalText = ", click anywhere on the screen to begin."
             }
             text("(" + Math.round(animationValues.assetsLoadedCount / animationValues.assetsToLoadCount * 100) + "%" + additionalText + ")", window.innerWidth / 2, window.innerHeight / 2 + 60)
@@ -206,9 +202,11 @@ function getEffectById(id) {
 }
 
 function mousePressed() {
+    console.log("asdf")
     switch(stage) {
         case "menu":
             mouseIsOverButton(window.innerWidth / 2, window.innerHeight / 2, window.innerWidth / 3, 50, function() {
+                updateFrames = 0;
                 musics[soundtrackIndex].stop()
                 musics[soundtrackIndex].play()
                 stage = "game"
@@ -253,6 +251,12 @@ function mousePressed() {
             } else {
                 score -= 500
                 score = Math.max(score, 0)
+            }
+            break;
+        case "loading":
+            if(animationValues.assetsLoadedCount == animationValues.assetsToLoadCount) {
+                stage = "menu";
+                musics[soundtrackIndex].play()
             }
             break;
     }
