@@ -13,7 +13,7 @@ var updateFrames = 0;
 var score = 0;
 var animationValues = {
     assetsLoadedCount: 0,
-    assetsToLoadCount: 5,
+    assetsToLoadCount: 6,
 }
 var bubbles = [];
 function setup() {
@@ -142,15 +142,20 @@ function drawBubbles() {
     for(var i = 0; i != bubbles.length; i++) {
         if(!bubbles[i].clicked){
             if(bubbles[i].frames >= updateFrames && bubbles[i].frames - 60 <= updateFrames) {
-                var percentage = Math.round(Math.abs(bubbles[i].frames - updateFrames) * 1.66666666666666666)
-                stroke("rgb(0, 0, " + (255 - Math.round(percentage * 2.55)) + ")")
+                if(soundtracks[soundtrackIndex].bubbleColoring == undefined) {
+                    percentage = Math.round(Math.abs(bubbles[i].frames - updateFrames) * 1.66666666666666666)
+                    stroke("rgb(0, 0, " + (255 - Math.round(percentage * 2.55)) + ")")
+                } else {
+                    percentage = Math.round(Math.abs(bubbles[i].frames - updateFrames) * 1.66666666666666666)
+                    soundtracks[soundtrackIndex].bubbleColoring()
+                }
                 strokeWeight(5)
                 noFill()
                 circle(bubbles[i].x * window.innerWidth, bubbles[i].y * window.innerHeight, 100)
                 circle(bubbles[i].x * window.innerWidth, bubbles[i].y * window.innerHeight, 100 + Math.abs(bubbles[i].frames - updateFrames) * 2)
             }
             if(bubbles[i].frames == updateFrames) {
-                score -= 1000;
+                score -= 500;
                 score = Math.max(score, 0)
             }
         }
@@ -201,51 +206,55 @@ function getEffectById(id) {
 }
 
 function mousePressed() {
-    if(stage == "menu") {
-        mouseIsOverButton(window.innerWidth / 2, window.innerHeight / 2, window.innerWidth / 3, 50, function() {
-            musics[soundtrackIndex].stop()
-            musics[soundtrackIndex].play()
-            stage = "game"
-            score = 0;
-            bubbles = JSON.parse(JSON.stringify(soundtracks[soundtrackIndex].bubbles))
-        })
-        var triangleBaseLeft = {x: window.innerWidth / 3 + 30, y: window.innerHeight / 2 - 60}
-        var triangleBaseRight = {x: (window.innerWidth / 3) * 2 - 30, y: window.innerHeight / 2 - 60}
-        if(mouseY > triangleBaseLeft.y - 20 && mouseY < triangleBaseLeft.y + 20){
-            if(mouseX > triangleBaseLeft.x - 20 && mouseX < triangleBaseLeft.x + 10) {
+    switch(stage) {
+        case "menu":
+            mouseIsOverButton(window.innerWidth / 2, window.innerHeight / 2, window.innerWidth / 3, 50, function() {
                 musics[soundtrackIndex].stop()
-                if(soundtrackIndex != 0) {
-                    soundtrackIndex--;
-                } else {
-                    soundtrackIndex = soundtracks.length - 1;
-                }
                 musics[soundtrackIndex].play()
-            } else if(mouseX > triangleBaseRight.x - 10 && mouseX < triangleBaseRight.x + 20) {
-                musics[soundtrackIndex].stop()
-                if(soundtrackIndex != soundtracks.length - 1) {
-                    soundtrackIndex++;
-                } else {
-                    soundtrackIndex = 0;
-                }
-                musics[soundtrackIndex].play()
-            }
-        }
-    } else if(stage == "game") {
-        var bubbleClicked = false;
-        for(var i = 0; i != bubbles.length; i++) {
-            if(!bubbles[i].clicked){
-                if(bubbles[i].frames > updateFrames && bubbles[i].frames - 20 < updateFrames && dist(bubbles[i].x * window.innerWidth, bubbles[i].y * window.innerHeight, mouseX, mouseY) < 60) {
-                    bubbleClicked = true;
-                    bubbles[i].clicked = true;
+                stage = "game"
+                score = 0;
+                bubbles = JSON.parse(JSON.stringify(soundtracks[soundtrackIndex].bubbles))
+            })
+            var triangleBaseLeft = {x: window.innerWidth / 3 + 30, y: window.innerHeight / 2 - 60}
+            var triangleBaseRight = {x: (window.innerWidth / 3) * 2 - 30, y: window.innerHeight / 2 - 60}
+            if(mouseY > triangleBaseLeft.y - 20 && mouseY < triangleBaseLeft.y + 20){
+                if(mouseX > triangleBaseLeft.x - 20 && mouseX < triangleBaseLeft.x + 10) {
+                    musics[soundtrackIndex].stop()
+                    if(soundtrackIndex != 0) {
+                        soundtrackIndex--;
+                    } else {
+                        soundtrackIndex = soundtracks.length - 1;
+                    }
+                    musics[soundtrackIndex].play()
+                } else if(mouseX > triangleBaseRight.x - 10 && mouseX < triangleBaseRight.x + 20) {
+                    musics[soundtrackIndex].stop()
+                    if(soundtrackIndex != soundtracks.length - 1) {
+                        soundtrackIndex++;
+                    } else {
+                        soundtrackIndex = 0;
+                    }
+                    musics[soundtrackIndex].play()
                 }
             }
-        }
-        if(bubbleClicked == true) {
-            snare.play()
-            score += 500
-        } else {
-            score -= 500
-            score = Math.max(score, 0)
-        }
+            break;
+        case "game":
+            var bubbleClicked = false;
+            for(var i = 0; i != bubbles.length; i++) {
+                if(!bubbles[i].clicked){
+                    if(bubbles[i].frames > updateFrames && bubbles[i].frames - 20 < updateFrames && dist(bubbles[i].x * window.innerWidth, bubbles[i].y * window.innerHeight, mouseX, mouseY) < 60) {
+                        bubbleClicked = true;
+                        bubbles[i].clicked = true;
+                    }
+                }
+            }
+            if(bubbleClicked == true) {
+                snare.play()
+                score += 500
+            } else {
+                score -= 500
+                score = Math.max(score, 0)
+            }
+            break;
     }
+
 }
