@@ -13,7 +13,7 @@ var updateFrames = 0;
 var score = 0;
 var animationValues = {
     assetsLoadedCount: 0,
-    assetsToLoadCount: 6,
+    assetsToLoadCount: 7,
 }
 var bubbles = [];
 function setup() {
