@@ -298,6 +298,7 @@ function mousePressed() {
                     snare.play()
                     score += 500
                     onFireCounter += 50
+                    onFireCounter = Math.min(300, onFireCounter);
                 } else {
                     score -= 500
                     score = Math.max(score, 0)
