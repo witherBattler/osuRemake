@@ -15,7 +15,7 @@ var updateFrames = 0;
 var score = 0;
 var animationValues = {
     assetsLoadedCount: 0,
-    assetsToLoadCount: 7,
+    assetsToLoadCount: 8,
 }
 var bubbles = [];
 function setup() {
@@ -29,6 +29,7 @@ function setup() {
         musics[i].onended(function() {
             if(stage == "game" && updateFrames > 60 && !paused){
                 stage = "menu";
+                musics[soundtrackIndex].play()
             }
         })
     }
@@ -54,14 +55,13 @@ function draw() {
             textAlign(LEFT, TOP)
             text(score, 10, 5);
             rectMode(CORNER)
-            rect(20 + textWidth(score), 5, onFireCounter, 40)
+            rect(20 + textWidth(score), 7, onFireCounter, 40)
             fill(soundtracks[soundtrackIndex].backgroundColor)
             text(onFireCounter, 25 + textWidth(score), 5)
             fill("red")
             if(onFireCounter > 200) {
-                text("ON FIRE!!!", 30 + textWidth(score) + onFireCounter, 5)
+                text("W", 30 + textWidth(score) + onFireCounter, 5)
             }
-            
             noStroke();
             fill("black")
             ellipse(window.innerWidth / 2, window.innerHeight / 2, level * (window.innerWidth / 2))
@@ -104,12 +104,17 @@ function draw() {
                 stroke(soundtracks[soundtrackIndex].secondColor)
                 strokeWeight(5)
                 rectMode(CENTER)
-                rect(window.innerWidth / 2, window.innerHeight - 200, window.innerWidth / 3, 50, 15, 15, 15, 15)
+                rect(window.innerWidth / 2, window.innerHeight - 225, window.innerWidth / 3, 50, 15, 15, 15, 15)
+                rect(window.innerWidth / 2, window.innerHeight - 325, window.innerWidth / 3, 50, 15, 15, 15, 15)
                 noStroke();
                 fill(soundtracks[soundtrackIndex].secondColor)
                 textSize(35)
-                text("Back to menu", window.innerWidth / 2, window.innerHeight - 200 - 5)
-                mouseIsOverButton(window.innerWidth / 2, window.innerHeight - 200, window.innerWidth / 3, 50, function() {
+                text("Back to menu", window.innerWidth / 2, window.innerHeight - 225 - 5)
+                text("Retry", window.innerWidth / 2, window.innerHeight - 325 - 5)
+                mouseIsOverButton(window.innerWidth / 2, window.innerHeight - 225, window.innerWidth / 3, 50, function() {
+                    pointerCursor = true;
+                })
+                mouseIsOverButton(window.innerWidth / 2, window.innerHeight - 325, window.innerWidth / 3, 50, function() {
                     pointerCursor = true;
                 })
                 mouseIsOverButton(window.innerWidth / 2, window.innerHeight - 100, window.innerWidth, 80, function() {
@@ -311,10 +316,19 @@ function mousePressed() {
                         paused = false;
                         musics[soundtrackIndex].play()
                     }
-                    mouseIsOverButton(window.innerWidth / 2, window.innerHeight - 200, window.innerWidth / 3, 50, function() {
+                    mouseIsOverButton(window.innerWidth / 2, window.innerHeight - 225, window.innerWidth / 3, 50, function() {
                         paused = false;
                         musics[soundtrackIndex].stop()
+                        musics[soundtrackIndex].play()
                         stage = "menu";
+                    })
+                    mouseIsOverButton(window.innerWidth / 2, window.innerHeight - 325, window.innerWidth / 3, 50, function() {
+                        updateFrames = 0;
+                        musics[soundtrackIndex].stop()
+                        musics[soundtrackIndex].play()
+                        score = 0;
+                        bubbles = JSON.parse(JSON.stringify(soundtracks[soundtrackIndex].bubbles))
+                        paused = false;
                     })
                 }
             } else if(mouseButton == RIGHT) {
@@ -347,4 +361,24 @@ document.addEventListener("visibilitychange", (event) => {
 
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
+}
+
+
+
+
+
+
+const mapCreating = true;
+var bubblesCreator = [
+    
+]
+
+function keyPressed() {
+    if(mapCreating){
+        if(keyCode == 65) {
+            bubblesCreator.push({x: 0, y: 0, frames: updateFrames, clicked: false})
+        } else if(keyCode == 83) {
+            console.log(JSON.stringify(bubblesCreator))
+        }
+    }
 }
