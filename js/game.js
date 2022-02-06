@@ -52,6 +52,8 @@ function draw() {
             textAlign(LEFT, TOP)
             text(score, 10, 5);
             noStroke();
+            fill("black")
+            ellipse(window.innerWidth / 2, window.innerHeight / 2, level * (window.innerWidth / 2))
             if(!paused) {
                 updateFrames++;
                 //Visualize audio:
@@ -65,16 +67,14 @@ function draw() {
                 textFont(allerFont)
                 textSize(30)
                 noStroke()
-                text("Click anywhere to pause", window.innerWidth / 2, window.innerHeight - 100)
+                text("Right click anywhere to pause", window.innerWidth / 2, window.innerHeight - 100)
+                textFont(allerFont)
+                textSize(80)
+                noStroke()
+                fill("#ff66aa")
+                textAlign(CENTER, CENTER);
+                text(soundtracks[soundtrackIndex].name, window.innerWidth / 2, window.innerHeight / 2 - 5)
             }
-            fill("black")
-            ellipse(window.innerWidth / 2, window.innerHeight / 2, level * (window.innerWidth / 2))
-            textFont(allerFont)
-            textSize(80)
-            noStroke()
-            fill("#ff66aa")
-            textAlign(CENTER, CENTER);
-            text(soundtracks[soundtrackIndex].name, window.innerWidth / 2, window.innerHeight / 2 - 5)
             drawBubbles()
             if(paused) {
                 background("rgba(0, 0, 0, 0.5)")
@@ -83,9 +83,27 @@ function draw() {
                 textFont(allerFont)
                 textSize(30)
                 noStroke()
-                text("Click anywhere to continue", window.innerWidth / 2, window.innerHeight - 100)
+                text("Click here to continue", window.innerWidth / 2, window.innerHeight - 100)
                 textSize(100)
                 text("PAUSED!", window.innerWidth / 2, window.innerHeight / 3)
+                fill(soundtracks[soundtrackIndex].secondColor)
+                textSize(30)
+                text("Song: " + soundtracks[soundtrackIndex].name)
+                noFill();
+                stroke(soundtracks[soundtrackIndex].secondColor)
+                strokeWeight(5)
+                rectMode(CENTER)
+                rect(window.innerWidth / 2, window.innerHeight - 200, window.innerWidth / 3, 50, 15, 15, 15, 15)
+                noStroke();
+                fill(soundtracks[soundtrackIndex].secondColor)
+                textSize(35)
+                text("Back to menu", window.innerWidth / 2, window.innerHeight - 200 - 5)
+                mouseIsOverButton(window.innerWidth / 2, window.innerHeight - 200, window.innerWidth / 3, 50, function() {
+                    pointerCursor = true;
+                })
+                mouseIsOverButton(window.innerWidth / 2, window.innerHeight - 100, window.innerWidth, 80, function() {
+                    pointerCursor = true;
+                })
             }
             break;
         case "loading":
@@ -269,8 +287,15 @@ function mousePressed() {
                     score = Math.max(score, 0)
                 }
                 if(paused) {
-                    paused = false;
-                    musics[soundtrackIndex].play()
+                    if(mouseY < window.innerHeight - 60 && mouseY > window.innerHeight - 140){
+                        paused = false;
+                        musics[soundtrackIndex].play()
+                    }
+                    mouseIsOverButton(window.innerWidth / 2, window.innerHeight - 200, window.innerWidth / 3, 50, function() {
+                        paused = false;
+                        musics[soundtrackIndex].stop()
+                        stage = "menu";
+                    })
                 }
             } else if(mouseButton == RIGHT) {
                 if(!paused){

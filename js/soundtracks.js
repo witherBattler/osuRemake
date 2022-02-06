@@ -382,7 +382,6 @@ let soundtracks = [
         backgroundColor: "#04007a",
         secondColor: "#14c4e3",
         bubbleColoring: function() {
-            console.log("rgb(0, ," + (255 - Math.round(percentage * 2.55)) +", 0)")
             stroke("rgb(0, " + (255 - Math.round(percentage * 2.55)) +", 0)")
         },
         bubbles: [
