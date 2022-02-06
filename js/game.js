@@ -30,6 +30,7 @@ function setup() {
             if(stage == "game" && updateFrames > 60 && !paused){
                 stage = "menu";
                 musics[soundtrackIndex].play()
+                localStorage.setItem(soundtracks[soundtrackIndex].name, score)
             }
         })
     }
@@ -40,6 +41,7 @@ function setup() {
         animationValues.assetsLoadedCount++;
     })
     amp = new p5.Amplitude()
+    checkHighScores()
     frameRate(60)
 }
 var effects = [{}]
@@ -166,6 +168,8 @@ function draw() {
             triangle(triangleBaseLeft.x - 20, triangleBaseLeft.y, triangleBaseLeft.x + 10, triangleBaseLeft.y - 20, triangleBaseLeft.x + 10, triangleBaseLeft.y + 20)
             triangle(triangleBaseRight.x + 20, triangleBaseRight.y, triangleBaseRight.x - 10, triangleBaseRight.y - 20, triangleBaseRight.x - 10, triangleBaseRight.y + 20)
             text(soundtracks[soundtrackIndex].name, window.innerWidth / 2, triangleBaseLeft.y - 3)
+            textSize(25)
+            text("Highscore: " + localStorage.getItem(soundtracks[soundtrackIndex].name), window.innerWidth / 2, window.innerHeight / 2 - 100)
             if(mouseY > triangleBaseLeft.y - 20 && mouseY < triangleBaseLeft.y + 20){
                 if(mouseX > triangleBaseLeft.x - 20 && mouseX < triangleBaseLeft.x + 10) {
                     pointerCursor = true
@@ -372,6 +376,14 @@ function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
 }
 
+function checkHighScores() {
+    for(var i = 0; i != soundtracks.length; i++) {
+        console.log(soundtracks[i].name)
+        if(localStorage.getItem(soundtracks[i].name) == null) {
+            localStorage.setItem(soundtracks[i].name, 0)
+        }
+    }
+}
 
 
 
