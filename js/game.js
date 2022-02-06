@@ -316,6 +316,14 @@ function mousePressed() {
 
 }
 document.addEventListener('contextmenu', event => event.preventDefault());
+document.addEventListener("visibilitychange", (event) => {
+    if (document.visibilityState != "visible") {
+        if(stage == "game") {
+            paused = true;
+            musics[soundtrackIndex].pause()
+        }
+    }
+});
 
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
