@@ -384,6 +384,7 @@ let soundtracks = [
         bubbleColoring: function() {
             stroke("rgb(0, " + (255 - Math.round(percentage * 2.55)) +", 0)")
         },
+        fillColor: "green",
         bubbles: [
             {"x":generateCentered(0.6),"y":generateCentered(0.6),"frames":787,"clicked":false},
             {"x":generateCentered(0.6),"y":generateCentered(0.6),"frames":809,"clicked":false},

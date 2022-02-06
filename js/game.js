@@ -185,6 +185,14 @@ function draw() {
 function drawBubbles() {
     for(var i = 0; i != bubbles.length; i++) {
         if(!bubbles[i].clicked){
+            if(bubbles[i].frames > updateFrames && bubbles[i].frames - 20 < updateFrames) {
+                if(soundtracks[soundtrackIndex].bubbleColoring != undefined) {
+                    fill(soundtracks[soundtrackIndex].fillColor)
+                } else {
+                    fill("blue")
+                }
+                circle(bubbles[i].x * window.innerWidth, bubbles[i].y * window.innerHeight, 100 + onFireCounter / onFireChangeDivider)
+            }
             if(bubbles[i].frames >= updateFrames && bubbles[i].frames - 60 <= updateFrames) {
                 if(soundtracks[soundtrackIndex].bubbleColoring == undefined) {
                     percentage = Math.round(Math.abs(bubbles[i].frames - updateFrames) * 1.66666666666666666)
@@ -205,6 +213,7 @@ function drawBubbles() {
                 onFireCounter = Math.max(onFireCounter, 0)
             }
         }
+        
     }
 }
 
@@ -382,3 +391,4 @@ function keyPressed() {
         }
     }
 }
+
