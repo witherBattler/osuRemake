@@ -4,6 +4,8 @@ var snare
 var allerFont
 
 //Variables
+let onFireCounter = 0
+let onFireChangeDivider = 12;
 let paused = false;
 let level;
 let amp;
@@ -48,13 +50,24 @@ function draw() {
             background(soundtracks[soundtrackIndex].backgroundColor)
             textSize(40)
             noStroke()
-            fill("black")
+            fill(soundtracks[soundtrackIndex].secondColor)
             textAlign(LEFT, TOP)
             text(score, 10, 5);
+            rectMode(CORNER)
+            rect(20 + textWidth(score), 5, onFireCounter, 40)
+            fill(soundtracks[soundtrackIndex].backgroundColor)
+            text(onFireCounter, 25 + textWidth(score), 5)
+            fill("red")
+            if(onFireCounter > 200) {
+                text("ON FIRE!!!", 30 + textWidth(score) + onFireCounter, 5)
+            }
+            
             noStroke();
             fill("black")
             ellipse(window.innerWidth / 2, window.innerHeight / 2, level * (window.innerWidth / 2))
             if(!paused) {
+                onFireCounter -= 1
+                onFireCounter = Math.max(onFireCounter, 0)
                 updateFrames++;
                 //Visualize audio:
                 if(level != undefined) {
@@ -68,13 +81,14 @@ function draw() {
                 textSize(30)
                 noStroke()
                 text("Right click anywhere to pause", window.innerWidth / 2, window.innerHeight - 100)
-                textFont(allerFont)
-                textSize(80)
-                noStroke()
-                fill("#ff66aa")
-                textAlign(CENTER, CENTER);
-                text(soundtracks[soundtrackIndex].name, window.innerWidth / 2, window.innerHeight / 2 - 5)
             }
+            textFont(allerFont)
+            textSize(80)
+            noStroke()
+            fill(soundtracks[soundtrackIndex].secondColor)
+            textAlign(CENTER, CENTER);
+            text(soundtracks[soundtrackIndex].name, window.innerWidth / 2, window.innerHeight / 2 - 5)
+            
             drawBubbles()
             if(paused) {
                 background("rgba(0, 0, 0, 0.5)")
@@ -86,9 +100,6 @@ function draw() {
                 text("Click here to continue", window.innerWidth / 2, window.innerHeight - 100)
                 textSize(100)
                 text("PAUSED!", window.innerWidth / 2, window.innerHeight / 3)
-                fill(soundtracks[soundtrackIndex].secondColor)
-                textSize(30)
-                text("Song: " + soundtracks[soundtrackIndex].name)
                 noFill();
                 stroke(soundtracks[soundtrackIndex].secondColor)
                 strokeWeight(5)
@@ -177,18 +188,22 @@ function drawBubbles() {
                     percentage = Math.round(Math.abs(bubbles[i].frames - updateFrames) * 1.66666666666666666)
                     soundtracks[soundtrackIndex].bubbleColoring()
                 }
-                strokeWeight(5)
+                strokeWeight(5 + onFireCounter / onFireChangeDivider / 10)
                 noFill()
-                circle(bubbles[i].x * window.innerWidth, bubbles[i].y * window.innerHeight, 100)
-                circle(bubbles[i].x * window.innerWidth, bubbles[i].y * window.innerHeight, 100 + Math.abs(bubbles[i].frames - updateFrames) * 2)
+                circle(bubbles[i].x * window.innerWidth, bubbles[i].y * window.innerHeight, 100 + onFireCounter / onFireChangeDivider)
+                circle(bubbles[i].x * window.innerWidth, bubbles[i].y * window.innerHeight, 100 + Math.abs(bubbles[i].frames - updateFrames + onFireCounter / onFireChangeDivider) * 2)
             }
             if(bubbles[i].frames == updateFrames) {
                 score -= 500;
                 score = Math.max(score, 0)
+                onFireCounter -= 50
+                onFireCounter = Math.max(onFireCounter, 0)
             }
         }
     }
 }
+
+
 function drawEffects() {
     for(var i = 0; i != effects.length; i++) {
         switch(effects[i].type) {
@@ -282,9 +297,11 @@ function mousePressed() {
                 if(bubbleClicked == true) {
                     snare.play()
                     score += 500
+                    onFireCounter += 50
                 } else {
                     score -= 500
                     score = Math.max(score, 0)
+                    onFireCounter = 0
                 }
                 if(paused) {
                     if(mouseY < window.innerHeight - 60 && mouseY > window.innerHeight - 140){
