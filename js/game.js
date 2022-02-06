@@ -300,9 +300,11 @@ function mousePressed() {
                     onFireCounter += 50
                     onFireCounter = Math.min(300, onFireCounter);
                 } else {
-                    score -= 500
-                    score = Math.max(score, 0)
-                    onFireCounter = 0
+                    if(!paused) {
+                        score -= 500
+                        score = Math.max(score, 0)
+                        onFireCounter = 0
+                    }
                 }
                 if(paused) {
                     if(mouseY < window.innerHeight - 60 && mouseY > window.innerHeight - 140){
