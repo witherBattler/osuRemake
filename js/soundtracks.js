@@ -13,7 +13,7 @@ let soundtracks = [
     {
         name: "Poylow - Got Me",
         songPath: "music/music1.mp3",
-        backgroundColor: "rgb(51, 24, 107)",
+        backgroundColor: "#33186B",
         secondColor: "#ff66aa",
         bubbles: [
             {"x":0.2,"y":0.3,"frames":101,"clicked":false},
