@@ -48,7 +48,7 @@ function setup() {
 var effects = [{}]
 
 
-function draw() {Math.round(amp.getLevel() * 100)
+function draw() {
     switch(stage) {
         case "game":
             background(lightenDarkenColor(soundtracks[soundtrackIndex].backgroundColor, Math.round(level * 100)))
