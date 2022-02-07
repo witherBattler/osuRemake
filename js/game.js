@@ -4,6 +4,7 @@ var snare
 var allerFont
 
 //Variables
+let bubbleEffects = []
 let onFireCounter = 0
 let onFireChangeDivider = 12;
 let paused = false;
@@ -83,6 +84,7 @@ function draw() {Math.round(amp.getLevel() * 100)
                 textSize(30)
                 noStroke()
                 text("Right click anywhere to pause", window.innerWidth / 2, window.innerHeight - 100)
+                renderBubbleEffects()
             }
             textFont(allerFont)
             textSize(80)
@@ -309,6 +311,7 @@ function mousePressed() {
                         if(bubbles[i].frames > updateFrames && bubbles[i].frames - 20 < updateFrames && dist(bubbles[i].x * window.innerWidth, bubbles[i].y * window.innerHeight, mouseX, mouseY) < 60) {
                             bubbleClicked = true;
                             bubbles[i].clicked = true;
+                            createBubbleClickedEffect(bubbles[i].x, bubbles[i].y, 100 + onFireCounter / onFireChangeDivider)
                         }
                     }
                 }
@@ -422,4 +425,31 @@ function lightenDarkenColor(col, amt) {
     else if (g < 0) g = 0;
     return (usePound?"#":"") + String("000000" + (g | (b << 8) | (r << 16)).toString(16)).slice(-6);
 
+}
+
+function createBubbleClickedEffect(x, y, size) {
+    var color;
+    if(soundtracks[soundtrackIndex].bubbleColoring != undefined) {
+        color = soundtracks[soundtrackIndex].fillColor
+    } else {
+        color = "blue"
+    }
+    bubbleEffects.push({x: x, y: y, size: size, color: color, frames: 0})
+}
+
+function renderBubbleEffects() {
+    var elementsToRemove = []
+    for(var i = 0; i != bubbleEffects.length; i++) {
+        bubbleEffects[i].frames++;
+        bubbleEffects[i].size += 4
+        stroke(bubbleEffects[i].color)
+        noFill()
+        circle(bubbleEffects[i].x * window.innerWidth, bubbleEffects[i].y * window.innerHeight, bubbleEffects[i].size)
+        if(bubbleEffects[i].frames >= 60){
+            elementsToRemove.unshift(i)
+        }
+    }
+    for(var i = 0; i != elementsToRemove.length; i++) {
+        bubbleEffects.splice(elementsToRemove[i], 1)
+    }
 }
