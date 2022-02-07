@@ -268,7 +268,7 @@ function getEffectById(id) {
     return null;
 }
 
-function mousePressed() {
+function touchStarted() {
     switch(stage) {
         case "menu":
             if(mouseButton == LEFT){
