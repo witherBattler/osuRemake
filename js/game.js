@@ -279,6 +279,7 @@ function touchStarted() {
                     stage = "game"
                     score = 0;
                     bubbles = JSON.parse(JSON.stringify(soundtracks[soundtrackIndex].bubbles))
+                    randomizeBubbles()
                 })
                 var triangleBaseLeft = {x: window.innerWidth / 3 + 30, y: window.innerHeight / 2 - 60}
                 var triangleBaseRight = {x: (window.innerWidth / 3) * 2 - 30, y: window.innerHeight / 2 - 60}
@@ -453,3 +454,45 @@ function renderBubbleEffects() {
         bubbleEffects.splice(elementsToRemove[i], 1)
     }
 }
+
+function randomizeBubbles() {
+    let lastPosition = {x: 0.5, y: 0.5}
+    let bubbleXBad = false;
+    let bubbleYBad = false;
+    for(var i = 0; i != bubbles.length; i++) {
+        bubbles[i].x = lastPosition.x
+        bubbles[i].y = lastPosition.y
+        if(!bubbleXBad){
+            console.log("2")
+            bubbles[i].x += (Math.random() - 0.5) / 1.5
+        } else {
+            console.log("1")
+            if(Math.abs(bubbles[i].x - 0) > Math.abs(bubbles[i].x - 1)) {
+                bubbles[i].x -= 0.2
+            } else {
+                bubbles[i].x += 0.2
+            }
+        }
+        if(!bubbleYBad){
+            console.log("2")
+            bubbles[i].y += (Math.random() - 0.5) / 1.5
+        } else {
+            console.log("1")
+            if(Math.abs(bubbles[i].y - 0) > Math.abs(bubbles[i].y - 1)) {
+                bubbles[i].y -= 0.2
+            } else {
+                bubbles[i].y += 0.2
+            }
+        }
+        bubbleXBad = false;
+        bubbleYBad = false;
+        if(bubbles[i].x > 0.6 || bubbles[i].x < 0.4) {
+            bubbleXBad = true;
+        }
+        if(bubbles[i].y > 0.6 || bubbles[i].y < 0.4) {
+            bubbleYBad = true;
+        }
+        lastPosition = {x: bubbles[i].x, y: bubbles[i].y}
+    }
+}
+
