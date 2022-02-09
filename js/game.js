@@ -345,6 +345,7 @@ function touchStarted() {
                         musics[soundtrackIndex].play()
                         score = 0;
                         bubbles = JSON.parse(JSON.stringify(soundtracks[soundtrackIndex].bubbles))
+                        randomizeBubbles()
                         paused = false;
                     })
                 }
